@@ -164,3 +164,7 @@ From your docker host (or remote docker client):
 From your docker host (or remote docker client):
 
     docker exec gitbox ng-auth -x
+
+SSL:
+----
+Native SSL is not provided, but can be added through manipulating the /etc/nginx/nginx.conf file and uploading the appropriate certificates. This container also supports being placed behind a reverse SSL proxy (such as nginx). 
