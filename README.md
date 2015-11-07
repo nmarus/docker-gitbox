@@ -25,14 +25,13 @@ From your docker host (or remote docker client):
 
 From your docker host:
 
-    git clone -b stable https://github.com/nmarus/docker-gitbox.git
+    git clone stable https://github.com/nmarus/docker-gitbox.git
     cd docker-gitbox
     docker build --rm=true -t nmarus/docker-gitbox .
     docker run -d -it --name gitbox \
         -h <container_fqdn> \
         -p 80:80 \
         -v /srv/gitbox/repos:/repos \
-        -v /srv/gitbox/ng-ssl:/ng-ssl \
         -v /srv/gitbox/ng-auth:/ng-auth \
         nmarus/docker-gitbox
 
