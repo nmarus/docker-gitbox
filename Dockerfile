@@ -1,50 +1,62 @@
-#gitbox with gitlist v.0.5.0
-FROM ubuntu:trusty
-MAINTAINER Nick Marus <nmarus@gmail.com>
+# gitbox with gitlist v.0.5.0
+# https://github.com/nmarus/docker-gitbox
+# Nicholas Marus <nmarus@gmail.com>
 
-#Setup enviroment variables
-ENV CNAME="gitbox"
-ENV ADMIN="gitadmin"
+FROM debian:jessie
+MAINTAINER Nicholas Marus <nmarus@gmail.com>
 
-#Setup Container
+# Setup Container
 VOLUME ["/repos"]
 VOLUME ["/ng-auth"]
 EXPOSE 80
 
-#update, install prerequisites, clean up apt
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && \
-	apt-get -y install git wget nginx-full php5-fpm fcgiwrap apache2-utils && \
-	apt-get clean
+# Setup Environment Variables
+ENV ADMIN="gitadmin"
 
-#setup user for nginx services
+# Setup APT
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+# Update, Install Prerequisites, Clean Up APT
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && \
+    apt-get -y install git wget nginx-full php5-fpm fcgiwrap apache2-utils && \
+    apt-get clean
+
+# Setup Container User
 RUN useradd -M -s /bin/false git --uid 1000
 
-#setup nginx services to run as user git, group git
+# Setup nginx php-fpm services to run as user git, group git
 RUN sed -i 's/user = www-data/user = git/g' /etc/php5/fpm/pool.d/www.conf && \
-	sed -i 's/group = www-data/group = git/g' /etc/php5/fpm/pool.d/www.conf && \
-	sed -i 's/listen.owner = www-data/listen.owner = git/g' /etc/php5/fpm/pool.d/www.conf && \
-	sed -i 's/listen.group = www-data/listen.group = git/g' /etc/php5/fpm/pool.d/www.conf && \
-	sed -i 's/FCGI_USER="www-data"/FCGI_USER="git"/g' /etc/init.d/fcgiwrap && \
-	sed -i 's/FCGI_GROUP="www-data"/FCGI_GROUP="git"/g' /etc/init.d/fcgiwrap && \
-	sed -i 's/FCGI_SOCKET_OWNER="www-data"/FCGI_SOCKET_OWNER="git"/g' /etc/init.d/fcgiwrap && \
-	sed -i 's/FCGI_SOCKET_GROUP="www-data"/FCGI_SOCKET_GROUP="git"/g' /etc/init.d/fcgiwrap
+    sed -i 's/group = www-data/group = git/g' /etc/php5/fpm/pool.d/www.conf && \
+    sed -i 's/listen.owner = www-data/listen.owner = git/g' /etc/php5/fpm/pool.d/www.conf && \
+    sed -i 's/listen.group = www-data/listen.group = git/g' /etc/php5/fpm/pool.d/www.conf
 
-#install gitlist
+# Setup nginx fcgi services to run as user git, group git
+RUN sed -i 's/FCGI_USER="www-data"/FCGI_USER="git"/g' /etc/init.d/fcgiwrap && \
+    sed -i 's/FCGI_GROUP="www-data"/FCGI_GROUP="git"/g' /etc/init.d/fcgiwrap && \
+    sed -i 's/FCGI_SOCKET_OWNER="www-data"/FCGI_SOCKET_OWNER="git"/g' /etc/init.d/fcgiwrap && \
+    sed -i 's/FCGI_SOCKET_GROUP="www-data"/FCGI_SOCKET_GROUP="git"/g' /etc/init.d/fcgiwrap
+
+# Install gitlist
 RUN mkdir -p /var/www && \
-	wget -q -O /var/www/gitlist-0.5.0.tar.gz https://s3.amazonaws.com/gitlist/gitlist-0.5.0.tar.gz && \
-	tar -zxvf /var/www/gitlist-0.5.0.tar.gz -C /var/www && \
-	chmod -R 777 /var/www/gitlist && \
-	mkdir -p /var/www/gitlist/cache && \
-	chmod 777 /var/www/gitlist/cache
+    wget -q -O /var/www/gitlist-0.5.0.tar.gz https://s3.amazonaws.com/gitlist/gitlist-0.5.0.tar.gz && \
+    tar -zxvf /var/www/gitlist-0.5.0.tar.gz -C /var/www && \
+    chmod -R 777 /var/www/gitlist && \
+    mkdir -p /var/www/gitlist/cache && \
+    chmod 777 /var/www/gitlist/cache
 
-#create config files for container startup, gitlist, and nginx
-COPY start.sh /start.sh
-COPY config.ini /var/www/gitlist/config.ini
+# Create config files for container startup and nginx
 COPY nginx.conf /etc/nginx/nginx.conf
+
+# Create config files for container
+COPY config.ini /var/www/gitlist/config.ini
 COPY repo-admin.sh /usr/local/bin/repo-admin
 COPY ng-auth.sh /usr/local/bin/ng-auth
-RUN chmod +x /start.sh && \
-	chmod +x /usr/local/bin/repo-admin && \
-	chmod +x /usr/local/bin/ng-auth
+RUN chmod +x /usr/local/bin/repo-admin
+RUN chmod +x /usr/local/bin/ng-auth
 
+# Create start.sh
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Startup
 CMD ["/start.sh"]
