@@ -14,6 +14,7 @@ The [master branch] (https://github.com/nmarus/docker-gitbox) is where all devel
 From your docker host (or remote docker client):
 
     docker run -d -it --name gitbox \
+        --restart=always \
         -h <container_fqdn> \
         -e FQDN=<container_fqdn> \
         -p 80:80 \
@@ -27,8 +28,9 @@ From your docker host:
 
     git clone https://github.com/nmarus/docker-gitbox.git
     cd docker-gitbox
-    docker build --rm=true -t nmarus/docker-gitbox .
+    docker build --rm -t nmarus/docker-gitbox .
     docker run -d -it --name gitbox \
+        --restart=always \
         -h <container_fqdn> \
         -p 80:80 \
         -v /srv/gitbox/repos:/repos \
