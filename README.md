@@ -19,7 +19,7 @@ From your docker host (or remote docker client):
         -p 80:80 \
         -v /srv/gitbox/repos:/repos \
         -v /srv/gitbox/ng-auth:/ng-auth \
-        nmarus/gitbox
+        nmarus/docker-gitbox
 
 **To install and run from this from the github source repository:**
 
