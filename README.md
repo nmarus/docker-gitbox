@@ -25,7 +25,7 @@ From your docker host (or remote docker client):
 
 From your docker host:
 
-    git clone stable https://github.com/nmarus/docker-gitbox.git
+    git clone https://github.com/nmarus/docker-gitbox.git
     cd docker-gitbox
     docker build --rm=true -t nmarus/docker-gitbox .
     docker run -d -it --name gitbox \
@@ -167,4 +167,4 @@ From your docker host (or remote docker client):
 
 SSL:
 ----
-Native SSL is not provided, but can be added through manipulating the /etc/nginx/nginx.conf file and uploading the appropriate certificates. This container also supports being placed behind a reverse SSL proxy (such as nginx). 
+Native SSL is not provided, but can be added through manipulating the /etc/nginx/nginx.conf file and uploading the appropriate certificates. This container also supports being placed behind a reverse SSL proxy (such as nginx).
