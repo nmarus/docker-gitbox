@@ -1,4 +1,4 @@
-# gitbox with gitlist v.0.5.0
+# gitbox with gitlist v.1.0.1
 # https://github.com/nmarus/docker-gitbox
 # Nicholas Marus <nmarus@gmail.com>
 
@@ -38,14 +38,15 @@ RUN sed -i 's/FCGI_USER="www-data"/FCGI_USER="git"/g' /etc/init.d/fcgiwrap && \
 
 # Install gitlist
 RUN mkdir -p /var/www && \
-    wget -q -O /var/www/gitlist-0.5.0.tar.gz https://s3.amazonaws.com/gitlist/gitlist-0.5.0.tar.gz && \
-    tar -zxvf /var/www/gitlist-0.5.0.tar.gz -C /var/www && \
+    wget -q -O /var/www/gitlist-v1.0.1.tar.gz https://github.com/klaussilveira/gitlist/releases/download/v1.0.1/gitlist-v1.0.1.tar.gz && \
+    tar -zxvf /var/www/gitlist-v1.0.1.tar.gz -C /var/www && \
     chmod -R 777 /var/www/gitlist && \
     mkdir -p /var/www/gitlist/cache && \
     chmod 777 /var/www/gitlist/cache
 
 # Create config files for container startup and nginx
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY git-http-backend.conf /etc/nginx/git-http-backend.conf
 
 # Create config files for container
 COPY config.ini /var/www/gitlist/config.ini
